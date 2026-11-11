@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BU Collection · Roadmap</title>
+<style>
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --ink:#0F1B2D; --muted:#475569; --line:#DDE3EA; --accent:#0B6B63;
+  --qw-bg:#DCF3E4; --qw-fg:#0F5B2E; --mp-bg:#DCE8FB; --mp-fg:#17418C; --fi-bg:#FBEFD5; --fi-fg:#7A4A00; --ts-bg:#FBE0E0; --ts-fg:#8A1C1C;
+  --bar:#CBD5E1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1622; --surface:#16202E; --ink:#E8EDF4; --muted:#A8B3C2; --line:#27344A; --accent:#5FC9BC;
+    --qw-bg:#16402A; --qw-fg:#9BE3B6; --mp-bg:#1B3560; --mp-fg:#A9C6F5; --fi-bg:#4A3510; --fi-fg:#F2CB84; --ts-bg:#5A1F1F; --ts-fg:#F5AEAE;
+    --bar:#33445E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1622; --surface:#16202E; --ink:#E8EDF4; --muted:#A8B3C2; --line:#27344A; --accent:#5FC9BC;
+  --qw-bg:#16402A; --qw-fg:#9BE3B6; --mp-bg:#1B3560; --mp-fg:#A9C6F5; --fi-bg:#4A3510; --fi-fg:#F2CB84; --ts-bg:#5A1F1F; --ts-fg:#F5AEAE;
+  --bar:#33445E;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding:40px 32px 64px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 32px;margin-bottom:24px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{margin:4px 0 6px;font-size:36px;line-height:1.1;letter-spacing:-.01em}
+.sub{margin:0;color:var(--muted);font-size:15px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px}
+.toggle{cursor:pointer;font:inherit}
+.toggle:focus-visible,.chip:focus-visible,.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:24px}
+.filters .label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.chip{font:inherit;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:start}
+.lane{background:color-mix(in srgb,var(--surface) 55%,transparent);border:1px solid var(--line);border-radius:14px;padding:16px}
+.lane h2{margin:0;font-size:18px;display:flex;align-items:center;gap:10px}
+.lane h2 .count{font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 9px}
+.lane .when{margin:2px 0 14px;color:var(--muted);font-size:13px}
+.lane.now{border-top:4px solid var(--accent)}
+.lane.next{border-top:4px solid #3B6FD1}
+.lane.later{border-top:4px solid #94A3B8}
+.cards{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%;display:block}
+.card:hover{border-color:var(--muted)}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.card .id{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em}
+.card h3{margin:2px 0 0;font-size:17px;line-height:1.25}
+.badge{flex:none;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;white-space:nowrap}
+.b-qw{background:var(--qw-bg);color:var(--qw-fg)}
+.b-mp{background:var(--mp-bg);color:var(--mp-fg)}
+.b-fi{background:var(--fi-bg);color:var(--fi-fg)}
+.b-ts{background:var(--ts-bg);color:var(--ts-fg)}
+.card p{margin:0;font-size:14px;color:var(--ink)}
+.detail{display:none;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.card[aria-expanded="true"] .detail{display:block}
+.score{display:grid;grid-template-columns:56px 1fr 24px;align-items:center;gap:10px;font-size:13px;color:var(--muted);margin-top:6px}
+.track{height:8px;border-radius:4px;background:var(--bar);overflow:hidden}
+.fill{height:100%;background:var(--accent);border-radius:4px}
+.fill.eff{background:#8B5CF6}
+.hint{font-size:12px;color:var(--muted);margin-top:8px}
+.empty{font-size:13px;color:var(--muted);padding:8px 2px}
+.dim{opacity:.28}
+.cut{margin-top:32px;background:var(--surface);border:1px solid var(--line);border-left:4px solid #C2410C;border-radius:14px;padding:20px}
+.cut h2{margin:0 0 4px;font-size:18px}
+.cut .sub{margin-bottom:14px;font-size:14px}
+.cutgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cutitem{border:1px dashed var(--line);border-radius:10px;padding:14px}
+.cutitem .id{font-size:12px;font-weight:600;color:var(--muted)}
+.cutitem h3{margin:2px 0 6px;font-size:16px;text-decoration:line-through;text-decoration-thickness:1px;color:var(--muted)}
+.cutitem p{margin:0;font-size:14px}
+footer{margin-top:24px;font-size:12px;color:var(--muted)}
+@media (max-width:980px){.board,.cutgrid{grid-template-columns:1fr}.wrap{padding:28px 18px 48px}h1{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">BU Collection · Instalment journey roadmap</div>
+      <h1>A Fair Way Forward</h1>
+      <p class="sub">Persona: Mara · Primary metric: step completion after the affordability questions · Guardrail: plan-kept rate</p>
+    </div>
+    <div class="meta">
+      <span class="pill">Team: squad of 5 (4 engineers, 1 designer)</span>
+      <button class="pill toggle" id="theme" type="button" aria-label="Toggle light or dark theme">Theme</button>
+    </div>
+  </header>
+
+  <div class="filters" role="group" aria-label="Filter by quadrant">
+    <span class="label">Quadrant</span>
+    <button class="chip" type="button" data-q="all" aria-pressed="true">All</button>
+    <button class="chip" type="button" data-q="Quick Win" aria-pressed="false">Quick Win</button>
+    <button class="chip" type="button" data-q="Major Project" aria-pressed="false">Major Project</button>
+    <button class="chip" type="button" data-q="Fill-In" aria-pressed="false">Fill-In</button>
+    <button class="chip" type="button" data-q="Time Sinker" aria-pressed="false">Time Sinker</button>
+  </div>
+
+  <main class="board" id="board"></main>
+
+  <section class="cut" aria-labelledby="cut-h">
+    <h2 id="cut-h">Cut List</h2>
+    <p class="sub">Not in scope. Cut because they do not move the primary metric or put the guardrail at risk.</p>
+    <div class="cutgrid" id="cut"></div>
+  </section>
+
+  <footer>Sample data, illustrative, not Riverty research. All people, numbers and events are fictional. Effort scores are estimates and need an engineering check.</footer>
+</div>
+
+<script>
+var QUAD = {"Quick Win":"b-qw","Major Project":"b-mp","Fill-In":"b-fi","Time Sinker":"b-ts"};
+var LANES = [
+  {key:"now", name:"NOW", when:"This sprint"},
+  {key:"next", name:"NEXT", when:"The following sprints"},
+  {key:"later", name:"LATER", when:"Backlog"}
+];
+var ITEMS = [
+  {id:"B2", name:"Income explainer", lane:"now", q:"Quick Win", v:5, e:1,
+   why:"It fixes exactly the income question where Mara leaves (19.3% drop) and is only content."},
+  {id:"B1", name:"One plan for several claims", lane:"next", q:"Major Project", v:4, e:5,
+   why:"It fixes Mara\u2019s two-claim problem (agreement 37.7% vs 52.1%) but acts after the finance questions and needs a new data model."},
+  {id:"B3", name:"Affordability check before plans", lane:"next", q:"Major Project", v:4, e:4,
+   why:"It protects the guardrail (19.0% of plans break) but adds logic and may add questions that lower the primary metric."},
+  {id:"B5", name:"Mobile upload fix", lane:"later", q:"Fill-In", v:3, e:2,
+   why:"It fixes 853 failed uploads (T-201) at the step after the primary metric, so build it if capacity allows."},
+  {id:"B7", name:"Shortest plan first", lane:"later", q:"Fill-In", v:1, e:1,
+   why:"Reject it: it repeats the Month 4 change, after which plans broke more (15.6% to 18.4%)."},
+  {id:"B4", name:"Agent handoff summary", lane:"cut", q:"Fill-In", v:2, e:3,
+   why:"It helps Daniel, not Mara, and does not move the primary metric."},
+  {id:"B6", name:"Pay-day payment date", lane:"cut", q:"Fill-In", v:2, e:3,
+   why:"The link to shift-income breakage (22.5%) is plausible but unproven, and it acts after the plan choice."},
+  {id:"B8", name:"Chat on every page", lane:"cut", q:"Time Sinker", v:1, e:4,
+   why:"Chat users miss more payments (21.6% vs 18.3%) and the chat hides consequences (T-208)."}
+];
+var filter = "all";
+
+function el(tag, cls, text){ var n=document.createElement(tag); if(cls) n.className=cls; if(text!=null) n.textContent=text; return n; }
+
+function scoreRow(label, val, extra){
+  var r = el("div","score");
+  r.appendChild(el("span",null,label));
+  var t = el("div","track"); var f = el("div","fill"+(extra?" "+extra:"")); f.style.width=(val*20)+"%"; t.appendChild(f); r.appendChild(t);
+  r.appendChild(el("span",null,String(val)));
+  return r;
+}
+
+function card(it){
+  var c = el("button","card");
+  c.type="button"; c.setAttribute("aria-expanded","false"); c.dataset.q=it.q;
+  var top = el("div","top");
+  var l = el("div"); l.appendChild(el("div","id",it.id)); l.appendChild(el("h3",null,it.name));
+  top.appendChild(l); top.appendChild(el("span","badge "+QUAD[it.q],it.q));
+  c.appendChild(top);
+  c.appendChild(el("p",null,it.why));
+  var d = el("div","detail");
+  d.appendChild(scoreRow("Value", it.v));
+  d.appendChild(scoreRow("Effort", it.e, "eff"));
+  d.appendChild(el("div","hint","Value 5 = directly moves the primary metric. Effort 5 = months of work."));
+  c.appendChild(d);
+  c.addEventListener("click", function(){
+    c.setAttribute("aria-expanded", c.getAttribute("aria-expanded")==="true" ? "false" : "true");
+  });
+  return c;
+}
+
+function render(){
+  var board = document.getElementById("board"); board.innerHTML="";
+  LANES.forEach(function(L){
+    var items = ITEMS.filter(function(i){ return i.lane===L.key; });
+    var lane = el("section","lane "+L.key);
+    var h = el("h2",null,L.name); h.appendChild(el("span","count",String(items.length))); lane.appendChild(h);
+    lane.appendChild(el("p","when",L.when));
+    var wrap = el("div","cards");
+    var shown = 0;
+    items.forEach(function(it){
+      if(filter==="all" || it.q===filter){ wrap.appendChild(card(it)); shown++; }
+    });
+    if(!shown) wrap.appendChild(el("div","empty","No items in this quadrant."));
+    lane.appendChild(wrap); board.appendChild(lane);
+  });
+  var cut = document.getElementById("cut"); cut.innerHTML="";
+  ITEMS.filter(function(i){return i.lane==="cut";}).forEach(function(it){
+    var c = el("div","cutitem");
+    var top = el("div"); top.style.display="flex"; top.style.justifyContent="space-between"; top.style.gap="8px";
+    top.appendChild(el("span","id",it.id)); top.appendChild(el("span","badge "+QUAD[it.q],it.q));
+    c.appendChild(top); c.appendChild(el("h3",null,it.name)); c.appendChild(el("p",null,it.why));
+    cut.appendChild(c);
+  });
+}
+
+document.querySelectorAll(".chip").forEach(function(b){
+  b.addEventListener("click", function(){
+    filter = b.dataset.q;
+    document.querySelectorAll(".chip").forEach(function(x){ x.setAttribute("aria-pressed", x===b ? "true":"false"); });
+    render();
+  });
+});
+
+document.getElementById("theme").addEventListener("click", function(){
+  var root = document.documentElement;
+  var dark = root.getAttribute("data-theme")==="dark" ||
+    (!root.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  root.setAttribute("data-theme", dark ? "light" : "dark");
+});
+
+render();
+</script>
+</body>
+</html>
