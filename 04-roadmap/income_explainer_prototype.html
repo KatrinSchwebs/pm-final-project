@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why we ask about income · Prototype</title>
+<style>
+:root{
+  --ink:#14243A; --muted:#475569; --ground:#EAEEF3; --surface:#FFFFFF; --line:#D5DDE7;
+  --accent:#0B6B63; --tint:#E6F3F1; --warn-bg:#FFF1D6; --warn-fg:#7A4300; --err:#B42318; --field:#7B8BA0;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.45;font-size:16px}
+.app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--surface);padding:16px 20px 28px;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.crumb{margin:0;font-size:14px;color:var(--muted)}
+h1{margin:6px 0 14px;font-size:27px;line-height:1.15;font-weight:700;letter-spacing:-.01em}
+h1:focus{outline:none}
+.explainer{background:var(--tint);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:14px 16px;margin:0 0 18px}
+.explainer p{margin:0;font-size:17px;line-height:1.45}
+.draft{display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:var(--warn-fg);background:var(--warn-bg);border-radius:4px;padding:2px 8px}
+.flag{background:var(--warn-bg);color:var(--warn-fg);border-radius:4px;padding:0 6px;font-weight:600}
+label{display:block;font-weight:600;font-size:16px;margin:0 0 6px}
+.field{display:flex;align-items:stretch;border:2px solid var(--field);border-radius:8px;background:#fff;min-height:52px}
+.field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,107,99,.25)}
+.field.invalid{border-color:var(--err)}
+.field .unit{display:flex;align-items:center;padding:0 12px;color:var(--muted);font-size:18px;border-right:1px solid var(--line)}
+.field input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:18px;padding:0 12px;color:var(--ink);outline:none}
+.error{min-height:22px;margin:6px 0 0;color:var(--err);font-size:14px}
+.linkbtn{font:inherit;font-size:16px;background:none;border:0;padding:0 2px;min-height:44px;color:var(--accent);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.btn{display:block;width:100%;min-height:52px;border:0;border-radius:8px;background:var(--accent);color:#fff;font:inherit;font-size:17px;font-weight:600;cursor:pointer}
+.btn:disabled{background:#C8D1DD;color:#4B5A6E;cursor:not-allowed}
+.btn.secondary{background:#fff;color:var(--accent);border:2px solid var(--accent)}
+.linkbtn:focus-visible,.btn:focus-visible,.closebtn:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.actions{margin-top:8px}
+.summary{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:0 0 12px}
+.summary .k{font-size:14px;color:var(--muted);margin:0}
+.summary .v{font-size:30px;font-weight:700;margin:2px 0 0}
+.next{margin:14px 0 18px}
+.next p{margin:0;font-size:17px}
+.endnote{margin:12px 0 0;padding:10px 12px;border-radius:8px;background:var(--tint);font-size:14px}
+[hidden]{display:none !important}
+
+/* detail sheet */
+.overlay{position:fixed;inset:0;background:rgba(15,27,45,.55);z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;margin:0 auto;max-width:480px;max-height:88vh;max-height:88dvh;overflow-y:auto;background:#fff;border-radius:16px 16px 0 0;padding:16px 20px 24px;z-index:21;animation:up .18s ease-out}
+@keyframes up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:4px}
+.sheet h2{margin:0;font-size:21px;line-height:1.2}
+.sheet h2:focus{outline:none}
+.closebtn{font:inherit;font-size:16px;min-height:44px;min-width:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer}
+.block{padding:14px 0;border-top:1px solid var(--line)}
+.block:first-of-type{border-top:0}
+.block h3{margin:0 0 4px;font-size:17px}
+.block p{margin:0;font-size:16px}
+
+/* prototype test log */
+details.log{margin-top:28px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+details.log summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+details.log table{width:100%;border-collapse:collapse;margin:8px 0}
+details.log td,details.log th{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line);font-weight:400}
+details.log th{font-weight:600;color:var(--ink)}
+.pass{color:#0F5B2E;font-weight:600}.fail{color:var(--err);font-weight:600}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- Screen 1: entry point -->
+  <section id="s-income" aria-labelledby="h-income">
+    <p class="crumb">Instalment plan · Affordability questions</p>
+    <h1 id="h-income" tabindex="-1">Your monthly income</h1>
+
+    <div class="explainer" id="explainer">
+      <p id="explainer-text">We ask about income to suggest instalments you can afford and keep. Please enter what you receive in a normal month.</p>
+      <span class="draft">Draft copy, pending Compliance sign-off</span>
+    </div>
+
+    <label for="amount">Monthly income in a normal month</label>
+    <div class="field" id="field">
+      <span class="unit" aria-hidden="true">&euro;</span>
+      <input id="amount" type="text" inputmode="decimal" autocomplete="off" maxlength="12" aria-describedby="amount-error" aria-invalid="false" placeholder="0.00">
+    </div>
+    <p class="error" id="amount-error" aria-live="polite"></p>
+
+    <button type="button" class="linkbtn" id="open-sheet" aria-haspopup="dialog">Read why we ask</button>
+
+    <div class="actions">
+      <button type="button" class="btn" id="continue1" disabled>Continue</button>
+    </div>
+  </section>
+
+  <!-- Screen 3: confirmation -->
+  <section id="s-confirm" aria-labelledby="h-confirm" hidden>
+    <p class="crumb">Instalment plan · Affordability questions</p>
+    <h1 id="h-confirm" tabindex="-1">Check your answer</h1>
+    <div class="summary">
+      <p class="k">Monthly income in a normal month</p>
+      <p class="v" id="confirm-amount">&nbsp;</p>
+    </div>
+    <button type="button" class="linkbtn" id="change">Change amount</button>
+    <div class="next">
+      <p>Next: upload income document</p>
+      <span class="draft">Draft copy, pending Compliance sign-off</span>
+    </div>
+    <button type="button" class="btn" id="continue2">Continue</button>
+    <p class="endnote" id="endnote" hidden>Prototype ends here. The document upload is not part of this prototype.</p>
+  </section>
+
+  <details class="log" id="log">
+    <summary>Test log (prototype only)</summary>
+    <table aria-label="Copy checks"><tbody id="checks"></tbody></table>
+    <table aria-label="Events"><thead><tr><th>Event</th><th>ms</th><th>Detail</th></tr></thead><tbody id="events"></tbody></table>
+    <p id="tot">Time on task: not finished yet.</p>
+    <button type="button" class="btn secondary" id="restart">Restart prototype</button>
+  </details>
+</div>
+
+<!-- Screen 2: detail sheet -->
+<div class="overlay" id="overlay" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+  <div class="sheet-head">
+    <h2 id="sheet-title" tabindex="-1">Why we ask about income</h2>
+    <button type="button" class="closebtn" id="close-sheet">Close</button>
+  </div>
+  <div class="block">
+    <h3>Why we ask</h3>
+    <p>We use your income to suggest instalments that fit your budget.</p>
+    <span class="draft">Draft copy, pending Compliance sign-off</span>
+  </div>
+  <div class="block">
+    <h3>Which income we mean</h3>
+    <p>We mean a normal month, not just this month. <span class="flag">[Period wording pending from Operations]</span></p>
+    <span class="draft">Draft copy, pending Compliance sign-off</span>
+  </div>
+  <div class="block">
+    <h3>How it is used and how long it is kept</h3>
+    <p>Your answer is used to suggest a plan. <span id="retention"></span></p>
+    <span class="draft">Draft copy, pending Compliance sign-off</span>
+  </div>
+  <button type="button" class="btn" id="back-sheet" style="margin-top:8px">Back to my answer</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // One constant for the retention period. Compliance has to supply it; no value is invented here.
+  var RETENTION_PERIOD = null;
+
+  var t0 = performance.now();
+  var events = [];            // in-memory only
+  var firstViewAt = null, doneAt = null, lastLoggedAmount = null;
+  var state = { amount: "" };
+
+  var $ = function(id){ return document.getElementById(id); };
+  var sIncome=$("s-income"), sConfirm=$("s-confirm"), input=$("amount"), field=$("field"), err=$("amount-error");
+  var cont1=$("continue1"), cont2=$("continue2"), openBtn=$("open-sheet"), sheet=$("sheet"), overlay=$("overlay");
+  var app=$("app"), lastScroll=0;
+
+  function log(name, detail){
+    var t = Math.round(performance.now()-t0);
+    events.push({name:name, t:t, detail:detail||""});
+    if(name==="explainer_viewed" && firstViewAt===null) firstViewAt=t;
+    if(name==="step_completed") doneAt=t;
+    renderLog();
+  }
+
+  /* ---------- validation: number >= 0, at most 2 decimals ---------- */
+  function validate(raw){
+    var v = raw.trim();
+    if(v==="" ) return {ok:false,msg:""};
+    if(/^\d+[.,]$/.test(v)) return {ok:false,msg:""};              // still typing
+    if(/^\d+([.,]\d{1,2})?$/.test(v)) return {ok:true,msg:""};
+    if(/^-/.test(v)) return {ok:false,msg:"Enter 0 or more."};
+    if(/^\d+[.,]\d{3,}$/.test(v)) return {ok:false,msg:"Use at most 2 decimals and no thousands separator, for example 1850.50."};
+    return {ok:false,msg:"Use numbers only, for example 1850 or 1850.50."};
+  }
+  function toNumber(raw){ return parseFloat(raw.trim().replace(",", ".")); }
+
+  function onInput(){
+    var r = validate(input.value);
+    state.amount = input.value;
+    cont1.disabled = !r.ok;
+    err.textContent = r.msg;
+    field.classList.toggle("invalid", !!r.msg);
+    input.setAttribute("aria-invalid", r.msg ? "true" : "false");
+  }
+  function onChange(){
+    var r = validate(input.value);
+    if(r.ok && lastLoggedAmount!==input.value){ lastLoggedAmount=input.value; log("amount_entered","valid"); }
+  }
+  input.addEventListener("input", onInput);
+  input.addEventListener("change", onChange);
+  input.addEventListener("blur", onChange);
+  input.addEventListener("keydown", function(e){ if(e.key==="Enter" && !cont1.disabled){ e.preventDefault(); goConfirm(); } });
+
+  /* ---------- screens + history ---------- */
+  function show(which, focusHeading){
+    var isConfirm = which==="confirm";
+    sIncome.hidden = isConfirm;
+    sConfirm.hidden = !isConfirm;
+    window.scrollTo(0,0);
+    if(focusHeading){ (isConfirm ? $("h-confirm") : $("h-income")).focus({preventScroll:true}); }
+    if(!isConfirm) log("explainer_viewed");
+    if(isConfirm){
+      var n = toNumber(state.amount);
+      $("confirm-amount").textContent = new Intl.NumberFormat("en-GB",{style:"currency",currency:"EUR"}).format(n);
+    }
+  }
+  function goConfirm(){
+    if(!validate(input.value).ok) return;
+    closeSheet(true);
+    history.pushState({s:"confirm"}, "", "#confirm");
+    show("confirm", true);
+  }
+  cont1.addEventListener("click", goConfirm);
+  $("change").addEventListener("click", function(){
+    history.pushState({s:"income"}, "", "#income");
+    show("income", true);
+    input.focus();
+  });
+  cont2.addEventListener("click", function(){
+    log("step_completed");
+    $("endnote").hidden=false;
+    cont2.disabled=true;
+  });
+  window.addEventListener("popstate", function(){
+    closeSheet(true);
+    var wantConfirm = (location.hash==="#confirm") && validate(state.amount).ok;
+    show(wantConfirm ? "confirm" : "income", true);
+  });
+
+  /* ---------- detail sheet ---------- */
+  var lastFocus=null;
+  function openSheet(){
+    lastScroll = window.pageYOffset;
+    lastFocus = document.activeElement;
+    overlay.hidden=false; sheet.hidden=false;
+    app.inert = true;
+    document.documentElement.style.overflow="hidden";
+    $("sheet-title").focus({preventScroll:true});
+    log("detail_opened");
+  }
+  function closeSheet(silent){
+    if(sheet.hidden) return;
+    overlay.hidden=true; sheet.hidden=true;
+    app.inert = false;
+    document.documentElement.style.overflow="";
+    if(!silent){
+      window.scrollTo(0,lastScroll);
+      (lastFocus && lastFocus.focus) ? lastFocus.focus({preventScroll:true}) : openBtn.focus({preventScroll:true});
+    }
+  }
+  openBtn.addEventListener("click", openSheet);
+  $("close-sheet").addEventListener("click", function(){ closeSheet(false); });
+  $("back-sheet").addEventListener("click", function(){ closeSheet(false); });
+  overlay.addEventListener("click", function(){ closeSheet(false); });
+  document.addEventListener("keydown", function(e){
+    if(sheet.hidden) return;
+    if(e.key==="Escape"){ closeSheet(false); return; }
+    if(e.key==="Tab"){
+      var f = sheet.querySelectorAll("button");
+      var first=f[0], last=f[f.length-1];
+      if(e.shiftKey && (document.activeElement===first || document.activeElement===$("sheet-title"))){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+    }
+  });
+
+  /* ---------- retention placeholder ---------- */
+  var ret = $("retention");
+  if(RETENTION_PERIOD){ ret.textContent = "We keep it for " + RETENTION_PERIOD + "."; }
+  else { ret.innerHTML = '<span class="flag">[Retention period pending from Compliance]</span>'; }
+
+  /* ---------- copy checks (safety guard) ---------- */
+  function copyChecks(){
+    var txt = $("explainer-text").textContent.trim();
+    var sentences = txt.split(/(?<=[.!?])\s+/).filter(Boolean);
+    var words = txt.split(/\s+/).filter(Boolean).length;
+    var maxSent = Math.max.apply(null, sentences.map(function(s){ return s.split(/\s+/).filter(Boolean).length; }));
+    var allCopy = (document.body.innerText || "");
+    var banned = /\b(never|always|guaranteed?)\b/i.test(allCopy);
+    var label = $("s-income").querySelector("label").textContent.toLowerCase();
+    return [
+      ["Explainer: 2 sentences or fewer", sentences.length<=2, sentences.length+" sentences"],
+      ["Explainer: 40 words or fewer", words<=40, words+" words"],
+      ["Explainer: 15 words or fewer per sentence", maxSent<=15, "longest "+maxSent],
+      ["Period named in text and field label", /normal month/i.test(txt) && /normal month/.test(label), ""],
+      ["No absolute-promise words", !banned, banned?"found one":"none found"],
+      ["Retention period is not invented", RETENTION_PERIOD===null || typeof RETENTION_PERIOD==="string", RETENTION_PERIOD===null?"placeholder shown":"value set"]
+    ];
+  }
+  function renderChecks(){
+    var tb=$("checks"); tb.innerHTML="";
+    copyChecks().forEach(function(c){
+      var tr=document.createElement("tr");
+      tr.innerHTML='<td>'+c[0]+'</td><td class="'+(c[1]?"pass":"fail")+'">'+(c[1]?"Pass":"Fail")+'</td><td>'+c[2]+'</td>';
+      tb.appendChild(tr);
+    });
+  }
+
+  /* ---------- test log ---------- */
+  function renderLog(){
+    var tb=$("events"); tb.innerHTML="";
+    events.forEach(function(e){
+      var tr=document.createElement("tr");
+      tr.innerHTML="<td>"+e.name+"</td><td>"+e.t+"</td><td>"+e.detail+"</td>";
+      tb.appendChild(tr);
+    });
+    $("tot").textContent = (doneAt!==null && firstViewAt!==null)
+      ? "Time on task: "+((doneAt-firstViewAt)/1000).toFixed(1)+" seconds (target: 45 seconds or less)."
+      : "Time on task: not finished yet.";
+  }
+  $("restart").addEventListener("click", function(){
+    events.length=0; firstViewAt=null; doneAt=null; lastLoggedAmount=null; t0=performance.now();
+    input.value=""; state.amount=""; onInput();
+    $("endnote").hidden=true; cont2.disabled=false;
+    closeSheet(true);
+    history.replaceState({s:"income"}, "", "#income");
+    show("income", true);
+  });
+
+  /* ---------- start ---------- */
+  history.replaceState({s:"income"}, "", "#income");
+  renderChecks();
+  show("income", false);
+})();
+</script>
+</body>
+</html>
